@@ -1,10 +1,7 @@
 import java.io.*;
 import java.util.*;
 
-/**
- * Created by daria on 03.10.14.
- */
-public class bridges {
+public class points {
     class FastScanner {
         StreamTokenizer st;
 
@@ -22,7 +19,7 @@ public class bridges {
 
         int nextInt() throws IOException {
             st.nextToken();
-            return (int)st.nval;
+            return (int) st.nval;
         }
 
         String nextString() throws IOException {
@@ -31,21 +28,12 @@ public class bridges {
         }
     }
 
-    class Pair {
-        int first;
-        int second;
-
-        Pair(int a, int b) {
-            first = a;
-            second = b;
-        }
-    }
 
     FastScanner in;
     PrintWriter out;
-    ArrayList<Pair>[] graph;
+    ArrayList<Integer>[] graph;
     boolean[] visited;
-    ArrayList<Integer> ans;
+    TreeSet<Integer> ans;
     int timer;
     int[] timeIn, fup;
 
@@ -53,52 +41,55 @@ public class bridges {
         int n = in.nextInt(), m = in.nextInt();
         graph = new ArrayList[n];
         for (int i = 0; i < n; i++) {
-            graph[i] = new ArrayList<Pair>();
+            graph[i] = new ArrayList<Integer>();
         }
         for (int i = 0; i < m; i++) {
             int a = in.nextInt() - 1, b = in.nextInt() - 1;
-            graph[a].add(new Pair(b, i + 1));
-            graph[b].add(new Pair(a, i + 1));
+            graph[a].add(b);
+            graph[b].add(a);
         }
         visited = new boolean[n];
-        ans = new ArrayList<Integer>();
-        timer = 0;
+        Arrays.fill(visited, false);
+        ans = new TreeSet<Integer>();
+        timer = 1;
         fup = new int[n];
         timeIn = new int[n];
-        Arrays.fill(visited, false);
         for (int i = 0; i < n; i++) {
             if (!visited[i])
                 dfs(i, -1);
         }
         out.println(ans.size());
-        Collections.sort(ans);
         for (int k : ans) {
-            out.print(k + " ");
+            out.println(k + 1);
         }
     }
 
     void dfs(int u, int p) {
         visited[u] = true;
         timeIn[u] = fup[u] = timer++;
-        for(Pair v : graph[u]) {
-            if (v.first == p)
+        int children = 0;
+        for(int v : graph[u]) {
+            if (v == p)
                 continue;
-            if (visited[v.first]) {
-                fup[u] = Math.min(fup[u], timeIn[v.first]);
+            if (visited[v]) {
+                fup[u] = Math.min(fup[u], timeIn[v]);
             }
             else {
-                dfs(v.first, u);
-                fup[u] = Math.min(fup[u], fup[v.first]);
-                if (fup[v.first] > timeIn[u])
-                    ans.add(v.second);
+                children++;
+                dfs(v, u);
+                fup[u] = Math.min(fup[u], fup[v]);
+                if (fup[v] >= timeIn[u] && p != -1)
+                    ans.add(u);
             }
         }
+        if (p == -1 && children > 1)
+            ans.add(u);
     }
 
     public void run() {
         try {
-            in = new FastScanner(new File("bridges.in"));
-            out = new PrintWriter("bridges.out");
+            in = new FastScanner(new File("points.in"));
+            out = new PrintWriter("points.out");
 
             solve();
 
@@ -109,6 +100,6 @@ public class bridges {
     }
 
     public static void main(String[] arg) {
-        new bridges().run();
+        new points().run();
     }
 }

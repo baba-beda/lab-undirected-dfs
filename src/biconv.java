@@ -2,9 +2,9 @@ import java.io.*;
 import java.util.*;
 
 /**
- * Created by daria on 03.10.14.
+ * Created by daria on 04.10.14.
  */
-public class bridges {
+public class biconv {
     class FastScanner {
         StreamTokenizer st;
 
@@ -31,74 +31,58 @@ public class bridges {
         }
     }
 
-    class Pair {
-        int first;
-        int second;
-
-        Pair(int a, int b) {
-            first = a;
-            second = b;
-        }
-    }
 
     FastScanner in;
     PrintWriter out;
-    ArrayList<Pair>[] graph;
+    ArrayList<Integer>[] graph;
+    int[] colors, fup, timeIn;
+    int maxColor;
     boolean[] visited;
     ArrayList<Integer> ans;
+    Stack<Integer> stack;
     int timer;
-    int[] timeIn, fup;
 
     public void solve() throws IOException {
         int n = in.nextInt(), m = in.nextInt();
         graph = new ArrayList[n];
-        for (int i = 0; i < n; i++) {
-            graph[i] = new ArrayList<Pair>();
-        }
-        for (int i = 0; i < m; i++) {
-            int a = in.nextInt() - 1, b = in.nextInt() - 1;
-            graph[a].add(new Pair(b, i + 1));
-            graph[b].add(new Pair(a, i + 1));
-        }
+        colors = new int[n];
         visited = new boolean[n];
-        ans = new ArrayList<Integer>();
-        timer = 0;
         fup = new int[n];
         timeIn = new int[n];
-        Arrays.fill(visited, false);
+        ans = new ArrayList<Integer>();
+        stack = new Stack<Integer>();
+
+        for (int i = 0; i < n; i++) {
+            graph[i] = new ArrayList<Integer>();
+        }
+
+        for (int i = 0; i < m; i++) {
+            int a = in.nextInt() - 1, b = in.nextInt() - 1;
+            graph[a].add(b);
+            graph[b].add(a);
+        }
+        maxColor = 0;
+        Arrays.fill(colors, 0);
+        timer = 0;
         for (int i = 0; i < n; i++) {
             if (!visited[i])
                 dfs(i, -1);
         }
-        out.println(ans.size());
-        Collections.sort(ans);
-        for (int k : ans) {
+        out.println(maxColor);
+        for (int k : colors) {
             out.print(k + " ");
         }
     }
 
     void dfs(int u, int p) {
-        visited[u] = true;
-        timeIn[u] = fup[u] = timer++;
-        for(Pair v : graph[u]) {
-            if (v.first == p)
-                continue;
-            if (visited[v.first]) {
-                fup[u] = Math.min(fup[u], timeIn[v.first]);
-            }
-            else {
-                dfs(v.first, u);
-                fup[u] = Math.min(fup[u], fup[v.first]);
-                if (fup[v.first] > timeIn[u])
-                    ans.add(v.second);
-            }
-        }
+
     }
+
 
     public void run() {
         try {
-            in = new FastScanner(new File("bridges.in"));
-            out = new PrintWriter("bridges.out");
+            in = new FastScanner(new File("biconv.in"));
+            out = new PrintWriter("biconv.out");
 
             solve();
 
@@ -109,6 +93,6 @@ public class bridges {
     }
 
     public static void main(String[] arg) {
-        new bridges().run();
+        new biconv().run();
     }
 }
